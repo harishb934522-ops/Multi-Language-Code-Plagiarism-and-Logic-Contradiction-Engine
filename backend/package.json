@@ -7,6 +7,11 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.21.0"
+    "@clerk/express": "^2.1.69",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.0",
+    "mongoose": "^9.10.1",
+    "svix": "^2.5.0"
   }
 }
