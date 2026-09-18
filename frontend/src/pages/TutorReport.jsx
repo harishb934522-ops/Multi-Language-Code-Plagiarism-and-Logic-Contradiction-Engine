@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import toast from 'react-hot-toast';
 import ReactDiffViewer from 'react-diff-viewer-continued';
+import Editor from '@monaco-editor/react';
+import Disclaimer from '../components/Disclaimer';
 
 export default function TutorReport() {
   const { id, submissionId } = useParams();
@@ -20,6 +22,7 @@ export default function TutorReport() {
   const [note, setNote] = useState('');
   const [updating, setUpdating] = useState(false);
   const [requesting, setRequesting] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -113,8 +116,25 @@ export default function TutorReport() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="max-w-6xl mx-auto p-6 space-y-6 animate-pulse">
+        <div className="flex justify-between items-center mb-6">
+          <div className="h-10 bg-gray-200 rounded w-64"></div>
+          <div className="h-10 bg-gray-200 rounded w-48"></div>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-6">
+          <div className="flex justify-between items-center mb-6">
+            <div className="h-8 bg-gray-200 rounded w-48"></div>
+            <div className="flex gap-4">
+              <div className="h-8 bg-gray-200 rounded w-24"></div>
+              <div className="h-8 bg-gray-200 rounded w-32"></div>
+            </div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8 mb-6">
+            <div className="h-32 bg-gray-200 rounded w-full"></div>
+            <div className="h-32 bg-gray-200 rounded w-full"></div>
+          </div>
+          <div className="h-48 bg-gray-200 rounded w-full"></div>
+        </div>
       </div>
     );
   }
@@ -142,7 +162,10 @@ export default function TutorReport() {
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Analysis Results</h2>
+          <div className="flex items-center">
+            <h2 className="text-2xl font-bold text-gray-800">Analysis Results</h2>
+            <Disclaimer />
+          </div>
           <div className="flex items-center gap-4">
             <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize 
               ${report.decision === 'cleared' ? 'bg-green-100 text-green-800' : 
@@ -241,6 +264,42 @@ export default function TutorReport() {
                  leftTitle={`Compared: ${targetSubmission.studentId}`}
                  rightTitle="This Submission"
                />
+            )}
+          </div>
+        )}
+
+        {submission.history && submission.history.length > 0 && (
+          <div className="border-t border-gray-200 pt-6 mt-6">
+            <div 
+              className="flex justify-between items-center cursor-pointer mb-4"
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              <h3 className="text-lg font-semibold">Submission History</h3>
+              <span className="text-gray-500">{showHistory ? '▲ Hide' : '▼ Show'} ({submission.history.length})</span>
+            </div>
+            
+            {showHistory && (
+              <div className="space-y-6">
+                {submission.history.map((hist, idx) => (
+                  <div key={idx} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="font-medium text-gray-700">Version {hist.version}</span>
+                      <span className="text-sm text-gray-500">
+                        Submitted: {new Date(hist.submittedAt).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="border border-gray-300 rounded-md overflow-hidden">
+                      <Editor
+                        height="200px"
+                        theme="vs-dark"
+                        language={hist.language || submission.language}
+                        value={hist.code}
+                        options={{ readOnly: true, minimap: { enabled: false } }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}

@@ -3,8 +3,17 @@ const router = express.Router();
 const Submission = require('../models/Submission');
 const Report = require('../models/Report');
 const Assessment = require('../models/Assessment');
-const { requireRole, getUserRole, handleMongooseError } = require('./auth');
+const { requireRole, getUserRole } = require('../middleware/auth');
 
+// Generic error handler for Mongoose validation errors
+const handleMongooseError = (err, res) => {
+  if (err.name === 'ValidationError') {
+    const messages = Object.values(err.errors).map(val => val.message);
+    return res.status(400).json({ error: messages.join(', ') });
+  }
+  console.error(err);
+  return res.status(500).json({ error: 'Internal Server Error' });
+};
 // GET /api/submissions/:id
 router.get('/:id', async (req, res) => {
   try {
@@ -40,7 +49,10 @@ router.get('/:id/report', async (req, res) => {
       }
     }
 
-    const report = await Report.findOne({ submissionId: req.params.id });
+    const report = await Report.findOne({ 
+      submissionId: req.params.id,
+      version: submission.version 
+    });
     if (!report) return res.status(404).json({ error: 'Report not found' });
 
     const reportObj = report.toObject();

@@ -30,8 +30,17 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="h-10 bg-gray-200 rounded w-64 mb-8 animate-pulse"></div>
+        <div className="grid gap-6 md:grid-cols-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col h-40 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mb-6"></div>
+              <div className="mt-auto h-8 bg-gray-200 rounded w-1/3"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -61,7 +70,7 @@ export default function StudentDashboard() {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-8 text-gray-800">Student Dashboard</h1>
       {assessments.length === 0 ? (
-        <p className="text-gray-500">No assessments available.</p>
+        <p className="text-gray-500">No assessments available yet</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           {assessments.map(assessment => (

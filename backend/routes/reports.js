@@ -3,7 +3,17 @@ const router = express.Router();
 const Report = require('../models/Report');
 const Submission = require('../models/Submission');
 const Assessment = require('../models/Assessment');
-const { requireRole, handleMongooseError } = require('./auth');
+const { requireRole } = require('../middleware/auth');
+
+// Generic error handler for Mongoose validation errors
+const handleMongooseError = (err, res) => {
+  if (err.name === 'ValidationError') {
+    const messages = Object.values(err.errors).map(val => val.message);
+    return res.status(400).json({ error: messages.join(', ') });
+  }
+  console.error(err);
+  return res.status(500).json({ error: 'Internal Server Error' });
+};
 
 // PATCH /api/reports/:id/decision
 router.patch('/:id/decision', requireRole('tutor'), async (req, res) => {

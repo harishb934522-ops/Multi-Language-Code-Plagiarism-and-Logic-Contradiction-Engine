@@ -1,6 +1,7 @@
 const Submission = require('../models/Submission');
 const Report = require('../models/Report');
-
+const { compareIR } = require('../lib/comparator');
+const { formatReport } = require('../lib/formatReport');
 const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'http://localhost:8000';
 const JAVA_SERVICE_URL = process.env.JAVA_SERVICE_URL || 'http://localhost:8080';
 
@@ -16,8 +17,8 @@ async function parseCode(language, code) {
 }
 
 async function sharedComparator(ir1, ir2) {
-  // Stubbed for Prompt 9
-  return { similarityScore: 0, structuralEvidence: [] };
+  const result = compareIR(ir1, ir2);
+  return { similarityScore: result.similarityScore, structuralEvidence: result.evidence };
 }
 
 async function compareIRs(ir1, ir2, lang1, lang2) {
@@ -28,7 +29,8 @@ async function compareIRs(ir1, ir2, lang1, lang2) {
       body: JSON.stringify({ ir1, ir2 })
     });
     if (!res.ok) throw new Error(`Compare failed for python: ${res.status}`);
-    return await res.json();
+    const data = await res.json();
+    return { similarityScore: data.similarityScore, structuralEvidence: data.evidence };
   } else {
     // Java or mixed use shared comparator
     return await sharedComparator(ir1, ir2);
@@ -140,6 +142,16 @@ async function runAnalysis(submissionId) {
       // java submissions get an empty contradictions array
     }
 
+    console.log(`[Analysis] Formatting Report with LLM`);
+    const llmReportText = await formatReport({
+      similarityScore: highestScore,
+      fingerprintMatch,
+      contradictions,
+      structuralEvidence,
+      partial,
+      language: submission.language
+    });
+
     console.log(`[Analysis] Saving Report`);
     const report = new Report({
       submissionId: submission._id,
@@ -148,9 +160,10 @@ async function runAnalysis(submissionId) {
       fingerprintMatch,
       contradictions,
       structuralEvidence,
-      llmReportText: "",
+      llmReportText: llmReportText,
       decision: "pending",
-      partial
+      partial,
+      version: submission.version
     });
     await report.save();
 

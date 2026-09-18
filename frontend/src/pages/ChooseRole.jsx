@@ -12,6 +12,8 @@ export default function ChooseRole() {
     setLoading(true)
     try {
       const token = await getToken()
+      console.log('[Frontend] Retrieved Clerk token:', token ? `${token.slice(0, 15)}... (len ${token.length})` : token)
+
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/set-role`, {
         method: 'POST',
         headers: {
@@ -25,11 +27,12 @@ export default function ChooseRole() {
         await user.reload()
         navigate(`/${role}-dashboard`)
       } else {
-        console.error('Failed to set role')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Failed to set role:', response.status, errorData)
         setLoading(false)
       }
     } catch (error) {
-      console.error(error)
+      console.error('[Frontend] Error selecting role:', error)
       setLoading(false)
     }
   }

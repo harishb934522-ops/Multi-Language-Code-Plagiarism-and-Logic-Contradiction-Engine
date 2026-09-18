@@ -28,11 +28,12 @@ async function getUserRole(userId) {
 
 function requireRole(role) {
   return async (req, res, next) => {
-    if (!req.auth || !req.auth.userId) {
+    const userId = req.auth?.userId;
+    if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     
-    const userRole = await getUserRole(req.auth.userId);
+    const userRole = await getUserRole(userId);
     
     if (userRole !== role) {
       return res.status(403).json({ error: `Forbidden: requires ${role} role` });

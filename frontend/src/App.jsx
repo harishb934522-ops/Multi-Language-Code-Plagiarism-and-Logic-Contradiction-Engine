@@ -8,6 +8,7 @@ import StudentAssessment from './pages/StudentAssessment'
 import TutorDashboard from './pages/TutorDashboard'
 import TutorAssessment from './pages/TutorAssessment'
 import TutorReport from './pages/TutorReport'
+import TutorGraph from './pages/TutorGraph'
 
 function App() {
   return (
@@ -54,6 +55,12 @@ function App() {
           <Route path="/tutor-dashboard/assessment/:id/submission/:submissionId" element={
             <ProtectedRoute role="tutor">
               <TutorReport />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/tutor-dashboard/assessment/:id/graph" element={
+            <ProtectedRoute role="tutor">
+              <TutorGraph />
             </ProtectedRoute>
           } />
         </Routes>

@@ -220,4 +220,56 @@ router.get('/:id/submissions', requireRole('tutor'), async (req, res) => {
   }
 });
 
+// GET /api/assessments/:id/graph (tutor only, must own assessment)
+router.get('/:id/graph', requireRole('tutor'), async (req, res) => {
+  try {
+    const assessment = await Assessment.findById(req.params.id);
+    if (!assessment) return res.status(404).json({ error: 'Assessment not found' });
+    if (assessment.createdBy !== req.auth.userId) return res.status(403).json({ error: 'Forbidden' });
+
+    const submissions = await Submission.find({ assessmentId: req.params.id }).lean();
+    const Report = require('../models/Report');
+    
+    const nodes = [];
+    const edges = [];
+    const edgeSet = new Set(); // to avoid duplicates if A->B and B->A exist
+
+    for (const sub of submissions) {
+      const report = await Report.findOne({ submissionId: sub._id }).lean();
+      
+      nodes.push({
+        id: sub._id.toString(),
+        label: sub.studentId,
+        language: sub.language,
+        decision: report ? report.decision : 'pending'
+      });
+
+      if (report && report.comparedAgainst) {
+        for (const comp of report.comparedAgainst) {
+          if (comp.score >= 40) {
+            // Create a unique key for the edge so we don't duplicate (A->B == B->A)
+            const id1 = sub._id.toString();
+            const id2 = comp.submissionId.toString();
+            const edgeKey = [id1, id2].sort().join('-');
+            
+            if (!edgeSet.has(edgeKey)) {
+              edgeSet.add(edgeKey);
+              edges.push({
+                source: id1,
+                target: id2,
+                similarity: comp.score
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return res.status(200).json({ nodes, edges });
+  } catch (err) {
+    if (err.name === 'CastError') return res.status(400).json({ error: 'Invalid assessment ID format' });
+    return handleMongooseError(err, res);
+  }
+});
+
 module.exports = router;

@@ -40,14 +40,40 @@ export default function TutorAssessment() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <div className="h-8 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+          </div>
+          <div className="h-10 bg-gray-200 rounded w-48 animate-pulse"></div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {[...Array(7)].map((_, i) => (
+                  <th key={i} className="px-6 py-3"><div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div></th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {[...Array(5)].map((_, i) => (
+                <tr key={i}>
+                  {[...Array(7)].map((_, j) => (
+                    <td key={j} className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-red-600 text-center p-4 bg-red-100 rounded-lg mt-8 mx-auto max-w-2xl">Error: {error} (Submissions endpoint may not be built yet)</div>;
+    return <div className="text-red-600 text-center p-4 bg-red-100 rounded-lg mt-8 mx-auto max-w-2xl">Error: {error}</div>;
   }
 
   const getRowClass = (decision) => {
@@ -91,7 +117,7 @@ export default function TutorAssessment() {
           <tbody className="bg-white divide-y divide-gray-200">
             {submissions.length === 0 ? (
               <tr>
-                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">No submissions yet (or endpoint 404s until built).</td>
+                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">No submissions yet.</td>
               </tr>
             ) : (
               submissions.map(sub => (

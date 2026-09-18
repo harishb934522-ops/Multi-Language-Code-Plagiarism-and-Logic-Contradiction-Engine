@@ -25,6 +25,7 @@ const reportSchema = new mongoose.Schema({
   decidedBy: { type: String, default: null },
   decidedAt: { type: Date, default: null },
   partial: { type: Boolean, default: false },
+  version: { type: Number, default: 1 },
   createdAt: { type: Date, default: Date.now }
 });
 
