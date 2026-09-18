@@ -9,10 +9,12 @@ import TutorDashboard from './pages/TutorDashboard'
 import TutorAssessment from './pages/TutorAssessment'
 import TutorReport from './pages/TutorReport'
 import TutorGraph from './pages/TutorGraph'
+import Layout from './components/Layout'
+import { ThemeProvider } from './components/ThemeContext'
 
 function App() {
   return (
-    <>
+    <ThemeProvider>
       <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
@@ -30,42 +32,42 @@ function App() {
           
           <Route path="/student-dashboard" element={
             <ProtectedRoute role="student">
-              <StudentDashboard />
+              <Layout role="student"><StudentDashboard /></Layout>
             </ProtectedRoute>
           } />
           
           <Route path="/student-dashboard/assessment/:id" element={
             <ProtectedRoute role="student">
-              <StudentAssessment />
+              <Layout role="student"><StudentAssessment /></Layout>
             </ProtectedRoute>
           } />
           
           <Route path="/tutor-dashboard" element={
             <ProtectedRoute role="tutor">
-              <TutorDashboard />
+              <Layout role="tutor"><TutorDashboard /></Layout>
             </ProtectedRoute>
           } />
 
           <Route path="/tutor-dashboard/assessment/:id" element={
             <ProtectedRoute role="tutor">
-              <TutorAssessment />
+              <Layout role="tutor"><TutorAssessment /></Layout>
             </ProtectedRoute>
           } />
 
           <Route path="/tutor-dashboard/assessment/:id/submission/:submissionId" element={
             <ProtectedRoute role="tutor">
-              <TutorReport />
+              <Layout role="tutor"><TutorReport /></Layout>
             </ProtectedRoute>
           } />
 
           <Route path="/tutor-dashboard/assessment/:id/graph" element={
             <ProtectedRoute role="tutor">
-              <TutorGraph />
+              <Layout role="tutor"><TutorGraph /></Layout>
             </ProtectedRoute>
           } />
         </Routes>
       </BrowserRouter>
-    </>
+    </ThemeProvider>
   )
 }
 

@@ -38,24 +38,28 @@ export default function ChooseRole() {
   }
 
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>Choose Your Role</h1>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
-        <button 
-          onClick={() => handleRoleSelection('student')}
-          disabled={loading}
-          style={{ padding: '1rem 2rem', fontSize: '1.2rem', cursor: 'pointer' }}
-        >
-          I'm a Student
-        </button>
-        <button 
-          onClick={() => handleRoleSelection('tutor')}
-          disabled={loading}
-          style={{ padding: '1rem 2rem', fontSize: '1.2rem', cursor: 'pointer' }}
-        >
-          I'm a Tutor
-        </button>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)] text-[var(--color-text-primary)]">
+      <div className="max-w-md w-full bg-[var(--color-surface)] p-8 rounded-xl shadow-sm border border-[var(--color-border)] text-center">
+        <h1 className="text-3xl font-bold mb-2">Welcome to CodeEngine</h1>
+        <p className="text-[var(--color-text-secondary)] mb-8">Choose your role to get started</p>
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <button 
+            onClick={() => handleRoleSelection('student')}
+            disabled={loading}
+            className="flex-1 py-3 px-4 bg-[var(--color-surface-hover)] border border-[var(--color-border)] text-[var(--color-text-primary)] font-medium rounded-lg hover:bg-[var(--color-border)] transition-colors disabled:opacity-50"
+          >
+            I'm a Student
+          </button>
+          <button 
+            onClick={() => handleRoleSelection('tutor')}
+            disabled={loading}
+            className="flex-1 py-3 px-4 bg-[var(--color-accent)] text-white font-medium rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors shadow-sm disabled:opacity-50"
+          >
+            I'm a Tutor
+          </button>
+        </div>
       </div>
     </div>
   )
+
 }

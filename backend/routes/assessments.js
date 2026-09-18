@@ -127,6 +127,55 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// GET /api/assessments/:id/overview (tutor only, must own assessment)
+router.get('/:id/overview', requireRole('tutor'), async (req, res) => {
+  try {
+    const assessment = await Assessment.findById(req.params.id);
+    if (!assessment) return res.status(404).json({ error: 'Assessment not found' });
+    if (assessment.createdBy !== req.auth.userId) return res.status(403).json({ error: 'Forbidden' });
+
+    const submissions = await Submission.find({ assessmentId: req.params.id }).lean();
+    const subIds = submissions.map(s => s._id);
+    const Report = require('../models/Report');
+    const reports = await Report.find({ submissionId: { $in: subIds } }).lean();
+
+    const decisionBreakdown = { pending: 0, cleared: 0, flagged: 0, needs_review: 0 };
+    let totalSimilarity = 0;
+    let totalContradictionsFound = 0;
+    let reportCount = 0;
+    const languageBreakdown = { java: 0, python: 0 };
+
+    submissions.forEach(sub => {
+      languageBreakdown[sub.language] = (languageBreakdown[sub.language] || 0) + 1;
+      const report = reports.find(r => r.submissionId.toString() === sub._id.toString());
+      if (report) {
+        decisionBreakdown[report.decision || 'pending']++;
+        totalSimilarity += (report.similarityScore || 0);
+        if (report.contradictions) {
+          totalContradictionsFound += report.contradictions.length;
+        }
+        reportCount++;
+      } else {
+        decisionBreakdown.pending++;
+      }
+    });
+
+    const averageSimilarityScore = reportCount > 0 ? Math.round(totalSimilarity / reportCount) : 0;
+
+    return res.status(200).json({
+      totalAssessments: 1,
+      totalSubmissions: submissions.length,
+      decisionBreakdown,
+      averageSimilarityScore,
+      totalContradictionsFound,
+      languageBreakdown
+    });
+  } catch (err) {
+    if (err.name === 'CastError') return res.status(400).json({ error: 'Invalid assessment ID format' });
+    return handleMongooseError(err, res);
+  }
+});
+
 // GET /api/assessments/:id/submission-count (tutor only)
 router.get('/:id/submission-count', requireRole('tutor'), async (req, res) => {
   try {

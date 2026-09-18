@@ -178,6 +178,7 @@ app.post("/api/users/set-role", async (req, res) => {
   }
 });
 
+app.use("/api/analytics", require("./routes/analytics"));
 app.use("/api/assessments", require("./routes/assessments"));
 app.use("/api/submissions", require("./routes/submissions"));
 app.use("/api/reports", require("./routes/reports"));

@@ -12,13 +12,15 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.61.9",
     "@monaco-editor/react": "^4.7.0",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.47.0",
     "react": "^19.2.8",
     "react-diff-viewer-continued": "^4.4.0",
     "react-dom": "^19.2.8",
     "react-force-graph-2d": "^1.29.1",
     "react-hot-toast": "^2.6.0",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
